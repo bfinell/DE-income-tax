@@ -7,7 +7,7 @@
 Do the following steps
 
     - python -m venv venv
-    - .\env\Scripts\activate.ps1
+    - .\venv\Scripts\activate.ps1
     - pip install -r requirements.txt
     - change the name in line "df = pd.read_excel("placeholder.xlsx")" to your file location you want to do the calculations on
     - run script in command line "python tax-calc.py"

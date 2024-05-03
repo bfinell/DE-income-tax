@@ -1,4 +1,14 @@
 import pandas as pd
+import configparser
+
+# Create a ConfigParser object
+config = configparser.ConfigParser()
+
+# Read the config.ini file
+config.read("config.ini")
+
+input_file = config["file"]["Input"]
+output_file = config["file"]["Output"]
 
 
 def tax2005_6(income: float) -> float:
@@ -6,12 +16,12 @@ def tax2005_6(income: float) -> float:
         return 0
     elif income <= 12739:
         y = (income - 7664) / 10000
-        return (1767, 48 * y + 1500) / 100
+        return (1767.48 * y + 1500) / 100
     elif income <= 52151:
         z = (income - 12739) / 10000
         return (457.48 * z + 2.397) / 100
     else:
-        return 0.42 * income
+        return 0.42
 
 
 def tax2007_8(income: float) -> float:
@@ -24,9 +34,9 @@ def tax2007_8(income: float) -> float:
         z = (income - 12739) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250000:
-        return 0.42 * income
+        return 0.42
     else:
-        return 0.45 * income
+        return 0.45
 
 
 def tax2009(income: float) -> float:
@@ -39,9 +49,9 @@ def tax2009(income: float) -> float:
         z = (income - 13139) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250400:
-        return 0.42 * income
+        return 0.42
     else:
-        return 0.45 * income
+        return 0.45
 
 
 def tax2010(income: float) -> float:
@@ -54,9 +64,9 @@ def tax2010(income: float) -> float:
         z = (income - 13469) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250730:
-        return 0.42 * income
+        return 0.42
     else:
-        return 0.45 * income
+        return 0.45
 
 
 def calculate_tax(income: float, year: int):
@@ -69,32 +79,39 @@ def calculate_tax(income: float, year: int):
     elif year == 2010:
         return tax2010(income)
     else:
-        raise ValueError("year out of range, only valid from 2005-2010")
+        raise ValueError(
+            f"year out of range, only valid from 2005-2010, {year} out of range"
+        )
 
 
 def is_married(partner):
+    if partner == "[2] Lebenspartner":  # Juliane added new filter -.-
+        return 0
     return int(partner[1])  # Assumes second char is bool value
 
 
 # some logic that should be improved
 def do_calculate_tax(row):
-    income = row["Eksolo"]
+    income = row["EKindiv"]
     year = row["syear"]
     partner = row["partner"]
     if is_married(partner):
         income /= 2
-    return calculate_tax(income, year)
+    return round(calculate_tax(income, year), 2)
 
 
 # Read dataset
-df = pd.read_excel("placeholder.xlsx")
+print(input_file)
+df = pd.read_excel(input_file)
 
 # Perform tax calculation for each row
 df["MTRsolo"] = df.apply(do_calculate_tax, axis=1)
 
 df["MTRsplit"] = df.apply(
     lambda row: (
-        calculate_tax((row["Eksolo"] + row["Ekspouse"]) / 2, row["syear"]) * 2
+        round(
+            (calculate_tax((row["EKindiv"] + row["EKspouse"]) / 2, row["syear"]) * 2), 2
+        )
         if is_married(row["partner"])
         else None
     ),
