@@ -21,7 +21,7 @@ def tax2005_6(income: float) -> float:
         z = (income - 12739) / 10000
         return (457.48 * z + 2.397) / 100
     else:
-        return 0.42
+        return 42
 
 
 def tax2007_8(income: float) -> float:
@@ -34,9 +34,9 @@ def tax2007_8(income: float) -> float:
         z = (income - 12739) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250000:
-        return 0.42
+        return 42
     else:
-        return 0.45
+        return 45
 
 
 def tax2009(income: float) -> float:
@@ -49,9 +49,9 @@ def tax2009(income: float) -> float:
         z = (income - 13139) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250400:
-        return 0.42
+        return 42
     else:
-        return 0.45
+        return 45
 
 
 def tax2010(income: float) -> float:
@@ -64,9 +64,9 @@ def tax2010(income: float) -> float:
         z = (income - 13469) / 10000
         return (457.48 * z + 2.397) / 100
     elif income <= 250730:
-        return 0.42
+        return 42
     else:
-        return 0.45
+        return 45
 
 
 def calculate_tax(income: float, year: int):
@@ -109,9 +109,7 @@ df["MTRsolo"] = df.apply(do_calculate_tax, axis=1)
 
 df["MTRsplit"] = df.apply(
     lambda row: (
-        round(
-            (calculate_tax((row["EKindiv"] + row["EKspouse"]) / 2, row["syear"]) * 2), 2
-        )
+        round((calculate_tax((row["EKindiv"] + row["EKspouse"]) / 2, row["syear"])), 2)
         if is_married(row["partner"])
         else None
     ),
