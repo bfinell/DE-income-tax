@@ -94,9 +94,6 @@ def is_married(partner):
 def do_calculate_tax(row):
     income = row["EKindiv"]
     year = row["syear"]
-    partner = row["partner"]
-    if is_married(partner):
-        income /= 2
     return round(calculate_tax(income, year), 2)
 
 
@@ -109,7 +106,7 @@ df["MTRsolo"] = df.apply(do_calculate_tax, axis=1)
 
 df["MTRsplit"] = df.apply(
     lambda row: (
-        round((calculate_tax((row["EKindiv"] + row["EKspouse"]) / 2, row["syear"])), 2)
+        round((calculate_tax((row["EKindiv"] + row["EKspouse"] / 2), row["syear"])), 2)
         if is_married(row["partner"])
         else None
     ),
